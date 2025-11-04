@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact Form | Submit to Google Sheet</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236a11cb'><path d='M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z'/></svg>">
+  <!-- SweetAlert2 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <style>
     * {
       margin: 0;
@@ -20,6 +22,7 @@
       justify-content: center;
       align-items: center;
       padding: 20px;
+      overflow-x: hidden;
     }
     
     .container {
@@ -29,6 +32,19 @@
       border-radius: 12px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       overflow: hidden;
+      animation: fadeInUp 0.8s ease-out;
+      transform-origin: center;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
     
     .header {
@@ -37,23 +53,58 @@
       padding: 25px 30px;
       text-align: center;
       position: relative;
+      overflow: hidden;
+    }
+    
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+      animation: pulse 8s infinite linear;
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
     }
     
     .header-icon {
       font-size: 40px;
       margin-bottom: 10px;
       display: inline-block;
+      animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
     }
     
     .header h1 {
       font-size: 28px;
       font-weight: 600;
       margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
     }
     
     .header p {
       opacity: 0.9;
       font-size: 16px;
+      position: relative;
+      z-index: 1;
     }
     
     .form-container {
@@ -62,6 +113,24 @@
     
     .form-group {
       margin-bottom: 20px;
+      animation: slideIn 0.6s ease-out;
+      animation-fill-mode: both;
+    }
+    
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .form-group:nth-child(4) { animation-delay: 0.4s; }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
     
     label {
@@ -69,6 +138,7 @@
       margin-bottom: 8px;
       font-weight: 500;
       color: #333;
+      transition: color 0.3s ease;
     }
     
     input, textarea {
@@ -84,6 +154,11 @@
       outline: none;
       border-color: #6a11cb;
       box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    input:valid, textarea:valid {
+      border-left: 4px solid #4CAF50;
     }
     
     textarea {
@@ -107,6 +182,23 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .submit-btn:hover::before {
+      left: 100%;
     }
     
     .submit-btn:hover {
@@ -166,6 +258,16 @@
       color: #666;
       font-size: 14px;
       border-top: 1px solid #eee;
+      animation: fadeIn 1s ease-out 0.8s both;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
     }
     
     @media (max-width: 600px) {
@@ -200,8 +302,8 @@
         </div>
 
         <div class="form-group">
-          <label for="email">Mobile Number</label>
-          <input type="number" id="number" name="number" placeholder="Enter your Mobile number" required>
+          <label for="number">Mobile Number</label>
+          <input type="tel" id="number" name="number" placeholder="Enter your Mobile number" required>
         </div>
         
         <div class="form-group">
@@ -222,6 +324,9 @@
     </div>
   </div>
 
+  <!-- SweetAlert2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyZO3jDVK3jqxW-JotxzK7Pw7VVqHhZtE7pQh3kImtMeRqFONc-KlseSkNXvB5bxIPlEA/exec'
     const form = document.forms['submit-to-google-sheet']
@@ -238,17 +343,36 @@
       
       fetch(scriptURL, { method: 'POST', body: new FormData(form), mode: 'no-cors' })
         .then(() => {
-          msg.innerHTML = "Thank you! Your message has been sent successfully."
-          msg.className = "success"
+          // Show SweetAlert success message
+          Swal.fire({
+            title: 'Success!',
+            text: 'Thank you! Your message has been sent successfully.',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 4000,
+            timerProgressBar: true,
+            didClose: () => {
+              // Redirect after 4 seconds
+              window.location.href = 'https://g.page/r/CRM2APIU5VCqEBM/review';
+            }
+          });
+          
+          // Also set a timeout as backup in case SweetAlert doesn't trigger redirect
           setTimeout(() => {
-            msg.innerHTML = ""
-            msg.className = ""
-          }, 5000)
+            window.location.href = 'https://g.page/r/CRM2APIU5VCqEBM/review';
+          }, 4000);
+          
           form.reset()
         })
         .catch(error => {
-          msg.innerHTML = "Sorry, there was an error sending your message. Please try again."
-          msg.className = "error"
+          // Show SweetAlert error message
+          Swal.fire({
+            title: 'Error!',
+            text: 'Sorry, there was an error sending your message. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'Try Again'
+          });
+          
           console.error('Error!', error.message)
         })
         .finally(() => {
