@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit to Google Sheet</title>
+</head>
+<body>
+  <form name="submit-to-google-sheet">
+    <label>Name:</label><br>
+    <input type="text" name="name" required><br><br>
+    
+    <label>Email:</label><br>
+    <input type="email" name="email" required><br><br>
+    
+    <label>Message:</label><br>
+    <textarea name="message" required></textarea><br><br>
+    
+    <button type="submit">Submit</button>
+  </form>
+
+  <p id="msg"></p>
+
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbw6s5yBoOsj4x_1vH9bXgIyKxzILYjalF_kzaZxVHochtdj9RwwEkAVA62_DKLZJUzlWw/exec'
+const form = document.forms['submit-to-google-sheet']
+const msg = document.getElementById('msg')
+
+form.addEventListener('submit', e => {
+  e.preventDefault()
+  fetch(scriptURL, { method: 'POST', body: new FormData(form), mode: 'no-cors' })
+    .then(() => {
+      msg.innerHTML = "Form submitted successfully!"
+      setTimeout(() => msg.innerHTML = "", 3000)
+      form.reset()
+    })
+    .catch(error => {
+      msg.innerHTML = "Error submitting form!"
+      console.error('Error!', error.message)
+    })
+})
+
+  </script>
+</body>
+</html>
